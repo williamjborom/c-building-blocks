@@ -6,18 +6,19 @@
 void bubble_sort(
     int array[], 
     size_t begin, 
-    size_t end, 
+    size_t end,
     policy_f should_swap)
 {
+    size_t size = sizeof(int);
     int i = 0;
     int j = 0;
-    for (i = 0; begin + i <= end; i++) {
-        for (j = 0; begin + j < end; j++) {
-            if (should_swap(array[begin + j], array[begin + (j+1)])) {
-                int temp1 = array[begin + j];
-                int temp2 = array[begin + (j+1)];
-                array[begin + j] = temp2;
-                array[begin + (j+1)] = temp1;
+    for (i = 0; begin + size*i <= end; i++) {
+        for (j = 0; begin + size*j < end; j++) {
+            if (should_swap(array[j], array[j+1])) {
+                int temp1 = array[j];
+                int temp2 = array[j+1];
+                array[j] = temp2;
+                array[j+1] = temp1;
             }
         }
     }
