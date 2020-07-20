@@ -82,4 +82,5 @@ void bubble_sort(
     size_t end, 
     policy_f should_swap);
 
-#endif // BUBBLE_SORT_H
+#endif 
+// BUBBLE_SORT_H
