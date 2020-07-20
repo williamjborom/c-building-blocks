@@ -103,7 +103,12 @@ typedef void (*deleter_f)(void*);
 // key / pair stored in the tree in an inorder traversal.
 typedef void (iterator_f)(void*, void*);
 
-struct treenode;
+typedef struct treenode {
+	struct treenode *PARENT;
+	struct treenode *LEFT;
+	struct treenode *RIGHT;
+	int value;
+} treenode_t;
 
 // The binary tree structure.
 typedef struct binary_tree
