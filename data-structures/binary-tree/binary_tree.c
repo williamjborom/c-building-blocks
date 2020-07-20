@@ -7,6 +7,11 @@ binary_tree_t* tree_new(
 	comparator_f comparator, 
 	deleter_f deleter)
 {
+	binary_tree_t my_tree = malloc((sizeof(binary_tree_t)));
+	my_tree->comparator = comparator;
+	my_tree->deleter = deleter;
+	my_tree->count = 0;
+	my_tree->root = NULL;
 	return NULL;
 }
 
