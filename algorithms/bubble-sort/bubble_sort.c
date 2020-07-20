@@ -11,14 +11,13 @@ void bubble_sort(
 {
     int i = 0;
     int j = 0;
-    size_t size = sizeof(int);
-    for (i = 0; begin + size*i <= end; i++) {
-        for (j = 0; begin + size*j < end; j++) {
-            if (should_swap(array[begin + size*j], array[begin + size*(j+1)])) {
-                int temp1 = array[begin + size*j];
-                int temp2 = array[begin + size*(j+1)];
-                array[begin + size*j] = temp1;
-                array[begin + size*(j+1)] = temp2;
+    for (i = 0; begin + i <= end; i++) {
+        for (j = 0; begin + j < end; j++) {
+            if (should_swap(array[begin + j], array[begin + (j+1)])) {
+                int temp1 = array[begin + j];
+                int temp2 = array[begin + (j+1)];
+                array[begin + j] = temp2;
+                array[begin + (j+1)] = temp1;
             }
         }
     }
