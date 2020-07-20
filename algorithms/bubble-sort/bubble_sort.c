@@ -14,7 +14,7 @@ void bubble_sort(
     size_t size = sizeof(int);
     for (i; begin + size*i <= end; i++) {
         for (j; begin + size*j < end; j++) {
-            if (should_swap(array[begin + size*j], array[begin + size*(j+1)]) {
+            if (should_swap(array[begin + size*j], array[begin + size*(j+1)])) {
                 int temp1 = array[begin + size*j];
                 int temp2 = array[begin + size*(j+1)];
                 array[begin + size*j] = temp1;
