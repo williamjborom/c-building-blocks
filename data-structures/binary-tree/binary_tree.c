@@ -10,7 +10,7 @@ typedef struct treenode {
 	struct treenode* RIGHT;
 	void* key;
 	int* value;
-} treenode_t;
+} tree_node_t;
 
 //TREE NEW----------------------------------------------------------------------------------------------------
 binary_tree_t* tree_new(
@@ -85,7 +85,6 @@ bool tree_insert(
 	void* value, 
 	void** out)
 {
-
 	return tree_insert_rec(tree, tree->comparator, tree->root, key, value, out);
 }
 //----------------------------------------------------------------------------------------------------
