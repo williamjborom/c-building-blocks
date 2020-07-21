@@ -47,7 +47,17 @@ void tree_delete(binary_tree_t* tree)
 
 //TREE INSERT----------------------------------------------------------------------------------------------------
 bool tree_insert_rec(binary_tree_t* t, comparator_f comparator, tree_node_t* node, void* key, void* value, void** out) {
-	if (comparator(key, node->key) == EQUAL) {
+	if (node == NULL) {
+		tree_node_t* newtreenode = malloc(sizeof(tree_node_t));
+		newtreenode->LEFT = NULL;
+		newtreenode->RIGHT = NULL;
+		newtreenode->key = key;
+		newtreenode->value = value;
+		newtreenode->PARENT = NULL;
+		t->root = newtreenode;
+		t->count = t->count + 1;
+		return true;
+	} else if (comparator(key, node->key) == EQUAL) {
 		*out = node->value;
 		node->value = value;
 		return true;	
@@ -86,7 +96,11 @@ bool tree_insert(
 	void* value, 
 	void** out)
 {
-	return tree_insert_rec(tree, tree->comparator, tree->root, key, value, out);
+	if (tree == NULL) {
+		return false;
+	} else {
+		return tree_insert_rec(tree, tree->comparator, tree->root, key, value, out);
+	}
 }
 //----------------------------------------------------------------------------------------------------
 
@@ -150,6 +164,29 @@ bool tree_remove_rec(binary_tree_t* t, deleter_f deleter, comparator_f comparato
 
 bool tree_remove(binary_tree_t* tree, void* key)
 {
+
+	if (tree == NULL || tree->root == NULL) {
+		return false;
+	}
+
+	if (tree->comparator(tree->root->key, key) == EQUAL) {
+		tree_node_t* node_to_remove = tree->root;
+		if(node_to_remove->LEFT != NULL && node_to_remove->RIGHT == NULL) {
+			tree->root = node_to_remove->LEFT;
+		} else if (node_to_remove-> LEFT == NULL && node_to_remove->RIGHT != NULL) {
+			tree->root = node_to_remove->RIGHT;
+		} else if (node_to_remove->LEFT == NULL && node_to_remove->RIGHT == NULL) {
+			tree->root = NULL;
+		} else if (node_to_remove->LEFT != NULL && node_to_remove->RIGHT != NULL) {
+			tree->root = node_to_remove->RIGHT;
+			tree_node_t* temp_to_insert = node_to_remove->LEFT;
+			tree_node_t* insert_spot = tree->root;
+			while (insert_spot->LEFT != NULL) {
+				insert_spot = insert_spot->LEFT;
+			}
+			insert_spot->LEFT = temp_to_insert;
+		}
+	}
 	return tree_remove_rec(tree, tree->deleter, tree->comparator, tree->root, key);
 }
 //----------------------------------------------------------------------------------------------------
