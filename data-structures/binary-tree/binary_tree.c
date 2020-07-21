@@ -3,6 +3,15 @@
 
 #include "binary_tree.h"
 
+//Defining Tree Node Structure
+typedef struct treenode {
+	struct treenode *PARENT;
+	struct treenode *LEFT;
+	struct treenode *RIGHT;
+	int *key;
+	int *value;
+} treenode_t;
+
 //TREE NEW----------------------------------------------------------------------------------------------------
 binary_tree_t* tree_new(
 	comparator_f comparator, 

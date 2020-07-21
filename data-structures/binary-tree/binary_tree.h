@@ -107,7 +107,8 @@ typedef struct treenode {
 	struct treenode *PARENT;
 	struct treenode *LEFT;
 	struct treenode *RIGHT;
-	int value;
+	int *key;
+	int *value;
 } treenode_t;
 
 // The binary tree structure.
