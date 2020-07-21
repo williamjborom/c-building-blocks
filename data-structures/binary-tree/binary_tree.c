@@ -1,6 +1,7 @@
 // binary_tree.c
 // Generic binary search tree data structure.
 
+#include <stdlib.h>
 #include "binary_tree.h"
 
 //Defining Tree Node Structure
@@ -29,7 +30,7 @@ binary_tree_t* tree_new(
 //TREE DELETE----------------------------------------------------------------------------------------------------
 void tree_delete_rec(deleter_f deleter, tree_node_t* node)
 {
-	if (node != null) {
+	if (node != NULL) {
 		tree_delete_rec(deleter, node->LEFT);
 		tree_delete_rec(deleter, node->RIGHT);
 		deleter(node->value);
@@ -45,24 +46,24 @@ void tree_delete(binary_tree_t* tree)
 
 
 //TREE INSERT----------------------------------------------------------------------------------------------------
-bool tree_insert_rec(tree_t* t, comparator_f comparator, tree_node_t* node, void* key, void* value, void** out) {
+bool tree_insert_rec(binary_tree_t* t, comparator_f comparator, tree_node_t* node, void* key, void* value, void** out) {
 	if (comparator(key, node->key) == EQUAL) {
 		*out = node->value;
 		node->value = value;
 		return true;	
 	} else if (comparator(key, node->key) == LESS && node->LEFT != NULL) {
-		return (tree_insert_rec(comparator, node->LEFT, key, value, out));
+		return (tree_insert_rec(t, comparator, node->LEFT, key, value, out));
 	} else if (comparator(key, node->key) == GREATER && node->RIGHT != NULL) {
-		return (tree_insert_rec(comparator, node->RIGHT, key, value, out));
+		return (tree_insert_rec(t, comparator, node->RIGHT, key, value, out));
 	} else if (comparator(key, node->key) == LESS && node->LEFT == NULL) {
 		tree_node_t* newtreenode = malloc(sizeof(tree_node_t));
 		newtreenode->LEFT = NULL;
 		newtreenode->RIGHT = NULL;
 		newtreenode->key = key;
 		newtreenode->value = value;
-		newtreenode->parent = node;
+		newtreenode->PARENT = node;
 		node->LEFT = newtreenode;
-		*(t->count) = *(t->count) + 1;
+		t->count = t->count + 1;
 		return true;
 	} else if (comparator(key, node->key) == GREATER && node->RIGHT == NULL) {
 		tree_node_t* newtreenode = malloc(sizeof(tree_node_t));
@@ -70,9 +71,9 @@ bool tree_insert_rec(tree_t* t, comparator_f comparator, tree_node_t* node, void
 		newtreenode->RIGHT = NULL;
 		newtreenode->key = key;
 		newtreenode->value = value;
-		newtreenode->parent = node;
+		newtreenode->PARENT = node;
 		node->RIGHT = newtreenode;
-		*(t->count) = *(t->count) + 1;
+		t->count = t->count + 1;
 		return true;
 	} else {
 		return false;
@@ -91,7 +92,7 @@ bool tree_insert(
 
 //TREE REMOVE----------------------------------------------------------------------------------------------------
 
-bool tree_remove_rec(tree_t* t, deleter_f deleter, comparator_f comparator, tree_node_t* node, void* key) {
+bool tree_remove_rec(binary_tree_t* t, deleter_f deleter, comparator_f comparator, tree_node_t* node, void* key) {
 	if(node->LEFT != NULL && comparator(node->LEFT->key, key) == EQUAL) {
 		tree_node_t* node_to_remove = node->LEFT;
 		if(node_to_remove->LEFT != NULL && node_to_remove->RIGHT == NULL) {
@@ -100,10 +101,10 @@ bool tree_remove_rec(tree_t* t, deleter_f deleter, comparator_f comparator, tree
 			node->LEFT = node_to_remove->RIGHT;
 		} else if (node_to_remove->LEFT == NULL && node_to_remove->RIGHT == NULL) {
 			node->LEFT = NULL;
-		} else if (node_to-_remove->LEFT != NULL && node_to_remove->RIGHT != NULL) {
+		} else if (node_to_remove->LEFT != NULL && node_to_remove->RIGHT != NULL) {
 			node->LEFT = node_to_remove->RIGHT;
 			tree_node_t* temp_to_insert = node_to_remove->LEFT;
-			temp_node_t* insert_spot = node->LEFT;
+			tree_node_t* insert_spot = node->LEFT;
 			while (insert_spot->LEFT != NULL) {
 				insert_spot = insert_spot->LEFT;
 			}
@@ -112,7 +113,7 @@ bool tree_remove_rec(tree_t* t, deleter_f deleter, comparator_f comparator, tree
 		deleter(node_to_remove->value);
 		deleter(node_to_remove->key);
 		deleter(node_to_remove);
-		*(t->count) = *(t->count) - 1;
+		t->count = t->count - 1;
 		return true;
 
 	} else if (node->RIGHT != NULL && comparator(node->RIGHT->key, key) == EQUAL) {
@@ -123,10 +124,10 @@ bool tree_remove_rec(tree_t* t, deleter_f deleter, comparator_f comparator, tree
 			node->RIGHT = node_to_remove->RIGHT;
 		} else if (node_to_remove->LEFT == NULL && node_to_remove->RIGHT == NULL) {
 			node->RIGHT = NULL;
-		} else if (node_to-_remove->LEFT != NULL && node_to_remove->RIGHT != NULL) {
+		} else if (node_to_remove->LEFT != NULL && node_to_remove->RIGHT != NULL) {
 			node->RIGHT = node_to_remove->RIGHT;
 			tree_node_t* temp_to_insert = node_to_remove->LEFT;
-			temp_node_t* insert_spot = node->LEFT;
+			tree_node_t* insert_spot = node->LEFT;
 			while (insert_spot->LEFT != NULL) {
 				insert_spot = insert_spot->LEFT;
 			}
@@ -135,13 +136,13 @@ bool tree_remove_rec(tree_t* t, deleter_f deleter, comparator_f comparator, tree
 		deleter(node_to_remove->value);
 		deleter(node_to_remove->key);
 		deleter(node_to_remove);
-		*(t->count) = *(t->count) - 1
+		t->count = t->count - 1;
 		return true;
 
 	} else if (comparator(key, node->key) ==LESS && node->LEFT != NULL) {
-		return (tree_remove_rec(tree, deleter, comparator, node->LEFT, key));
+		return (tree_remove_rec(t, deleter, comparator, node->LEFT, key));
 	} else if (comparator(key, node->key) == GREATER && node->RIGHT != NULL) {
-		return (tree_remove_rec(tree, deleter, comparator, node->RIGHT, key));
+		return (tree_remove_rec(t, deleter, comparator, node->RIGHT, key));
 	} else {
 		return false;
 	}
@@ -154,7 +155,7 @@ bool tree_remove(binary_tree_t* tree, void* key)
 //----------------------------------------------------------------------------------------------------
 
 //TREE FIND----------------------------------------------------------------------------------------------------
-void* tree_find_rec(comaprator_f comparator, tree_node_t* node, void* key) {
+void* tree_find_rec(comparator_f comparator, tree_node_t* node, void* key) {
 	if (comparator(key, node->key) == EQUAL) {
 		return node->value;	
 	} else if (comparator(key, node->key) == LESS && node->LEFT != NULL) {
@@ -168,14 +169,14 @@ void* tree_find_rec(comaprator_f comparator, tree_node_t* node, void* key) {
 
 void* tree_find(binary_tree_t* tree, void* key)
 {
-	return tree_find_rec(tree->comparator, t->root, key);
+	return tree_find_rec(tree->comparator, tree->root, key);
 }
 //----------------------------------------------------------------------------------------------------
 
 //TREE COUNT----------------------------------------------------------------------------------------------------
 size_t tree_count(binary_tree_t* tree)
 {
-	return *(t->count);
+	return tree->count;
 }
 //----------------------------------------------------------------------------------------------------
 
