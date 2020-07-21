@@ -5,11 +5,11 @@
 
 //Defining Tree Node Structure
 typedef struct treenode {
-	struct treenode *PARENT;
-	struct treenode *LEFT;
-	struct treenode *RIGHT;
-	int *key;
-	int *value;
+	struct treenode* PARENT;
+	struct treenode* LEFT;
+	struct treenode* RIGHT;
+	void* key;
+	int* value;
 } treenode_t;
 
 //TREE NEW----------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ binary_tree_t* tree_new(
 	my_tree->deleter = deleter;
 	my_tree->count = 0;
 	my_tree->root = NULL;
-	return NULL;
+	return my_tree;
 }
 //---------------------------------------------------------------------------------------------------
 
@@ -30,8 +30,8 @@ binary_tree_t* tree_new(
 void tree_delete_rec(deleter_f deleter, tree_node_t* node)
 {
 	if (node != null) {
-		tree_delete_rec(node->LEFT);
-		tree_delete_rec(node->RIGHT);
+		tree_delete_rec(deleter, node->LEFT);
+		tree_delete_rec(deleter, node->RIGHT);
 		deleter(node->value);
 		deleter(node);
 	} 
@@ -45,15 +45,15 @@ void tree_delete(binary_tree_t* tree)
 
 
 //TREE INSERT----------------------------------------------------------------------------------------------------
-bool tree_insert_rec(comparator_f comparator, tree_node_t* node, void* key, void* value, void** out) {
+bool tree_insert_rec(tree_t* t, comparator_f comparator, tree_node_t* node, void* key, void* value, void** out) {
 	if (comparator(key, node->key) == EQUAL) {
-		out = node->value;
+		*out = node->value;
 		node->value = value;
 		return true;	
 	} else if (comparator(key, node->key) == LESS && node->LEFT != NULL) {
-		return (tree_insert_rec(comparator, node->LEFT, key));
+		return (tree_insert_rec(comparator, node->LEFT, key, value, out));
 	} else if (comparator(key, node->key) == GREATER && node->RIGHT != NULL) {
-		return (tree_insert_rec(comparator, node->RIGHT, key));
+		return (tree_insert_rec(comparator, node->RIGHT, key, value, out));
 	} else if (comparator(key, node->key) == LESS && node->LEFT == NULL) {
 		tree_node_t* newtreenode = malloc(sizeof(tree_node_t));
 		newtreenode->LEFT = NULL;
@@ -62,6 +62,7 @@ bool tree_insert_rec(comparator_f comparator, tree_node_t* node, void* key, void
 		newtreenode->value = value;
 		newtreenode->parent = node;
 		node->LEFT = newtreenode;
+		*(t->count) = *(t->count) + 1;
 		return true;
 	} else if (comparator(key, node->key) == GREATER && node->RIGHT == NULL) {
 		tree_node_t* newtreenode = malloc(sizeof(tree_node_t));
@@ -71,6 +72,7 @@ bool tree_insert_rec(comparator_f comparator, tree_node_t* node, void* key, void
 		newtreenode->value = value;
 		newtreenode->parent = node;
 		node->RIGHT = newtreenode;
+		*(t->count) = *(t->count) + 1;
 		return true;
 	} else {
 		return false;
@@ -84,32 +86,63 @@ bool tree_insert(
 	void** out)
 {
 
-	return tree_insert_rec(tree->comparator, tree->root, key, value, out);
+	return tree_insert_rec(tree, tree->comparator, tree->root, key, value, out);
 }
 //----------------------------------------------------------------------------------------------------
 
 //TREE REMOVE----------------------------------------------------------------------------------------------------
-bool tree_remove_rec(comparator_f comparator, tree_node_t* node, void* key) {
+
+bool tree_remove_rec(tree_t* t, deleter_f deleter, comparator_f comparator, tree_node_t* node, void* key) {
 	if(node->LEFT != NULL && comparator(node->LEFT->key, key) == EQUAL) {
 		tree_node_t* node_to_remove = node->LEFT;
-		if(node_to_remove->LEFT != NULL) {
+		if(node_to_remove->LEFT != NULL && node_to_remove->RIGHT == NULL) {
 			node->LEFT = node_to_remove->LEFT;
-		} else if (node_to_remove->RIGHT != NULL) {
+		} else if (node_to_remove-> LEFT == NULL && node_to_remove->RIGHT != NULL) {
 			node->LEFT = node_to_remove->RIGHT;
+		} else if (node_to_remove->LEFT == NULL && node_to_remove->RIGHT == NULL) {
+			node->LEFT = NULL;
+		} else if (node_to-_remove->LEFT != NULL && node_to_remove->RIGHT != NULL) {
+			node->LEFT = node_to_remove->RIGHT;
+			tree_node_t* temp_to_insert = node_to_remove->LEFT;
+			temp_node_t* insert_spot = node->LEFT;
+			while (insert_spot->LEFT != NULL) {
+				insert_spot = insert_spot->LEFT;
+			}
+			insert_spot->LEFT = temp_to_insert;
 		}
+		deleter(node_to_remove->value);
+		deleter(node_to_remove->key);
+		deleter(node_to_remove);
+		*(t->count) = *(t->count) - 1;
 		return true;
+
 	} else if (node->RIGHT != NULL && comparator(node->RIGHT->key, key) == EQUAL) {
 		tree_node_t* node_to_remove = node->RIGHT;
-		if(node_to_remove->LEFT != NULL) {
+		if(node_to_remove->LEFT != NULL && node_to_remove->RIGHT == NULL) {
 			node->RIGHT = node_to_remove->LEFT;
-		} else if (node_to_remove->RIGHT != NULL) {
+		} else if (node_to_remove-> LEFT == NULL && node_to_remove->RIGHT != NULL) {
 			node->RIGHT = node_to_remove->RIGHT;
+		} else if (node_to_remove->LEFT == NULL && node_to_remove->RIGHT == NULL) {
+			node->RIGHT = NULL;
+		} else if (node_to-_remove->LEFT != NULL && node_to_remove->RIGHT != NULL) {
+			node->RIGHT = node_to_remove->RIGHT;
+			tree_node_t* temp_to_insert = node_to_remove->LEFT;
+			temp_node_t* insert_spot = node->LEFT;
+			while (insert_spot->LEFT != NULL) {
+				insert_spot = insert_spot->LEFT;
+			}
+			insert_spot->LEFT = temp_to_insert;
 		}
+		deleter(node_to_remove->value);
+		deleter(node_to_remove->key);
+		deleter(node_to_remove);
+		*(t->count) = *(t->count) - 1
 		return true;
+
 	} else if (comparator(key, node->key) ==LESS && node->LEFT != NULL) {
-		return (tree_remove_rec(comparator, node->LEFT, key));
+		return (tree_remove_rec(tree, deleter, comparator, node->LEFT, key));
 	} else if (comparator(key, node->key) == GREATER && node->RIGHT != NULL) {
-		return (tree_remove_rec(comparator, node->RIGHT, key));
+		return (tree_remove_rec(tree, deleter, comparator, node->RIGHT, key));
 	} else {
 		return false;
 	}
@@ -117,7 +150,7 @@ bool tree_remove_rec(comparator_f comparator, tree_node_t* node, void* key) {
 
 bool tree_remove(binary_tree_t* tree, void* key)
 {
-	return tree_remove_rec(tree->comparator, tree, key);
+	return tree_remove_rec(tree, tree->deleter, tree->comparator, tree->root, key);
 }
 //----------------------------------------------------------------------------------------------------
 
